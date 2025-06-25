@@ -1,12 +1,43 @@
 {
   "name": "workzen",
   "version": "1.0.0",
+  "description": "WorkZen - Productivity and Wellness App for Teams. Work better. Work human.",
   "main": "index.js",
   "license": "MIT",
+  "author": {
+    "name": "Reaxtiv",
+    "url": "https://github.com/Reaxtiv"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reaxtiv/workzen.git"
+  },
+  "homepage": "https://github.com/Reaxtiv/workzen",
+  "bugs": {
+    "url": "https://github.com/Reaxtiv/workzen/issues"
+  },
+  "keywords": [
+    "productivity",
+    "wellness",
+    "team-management",
+    "dashboard",
+    "analytics",
+    "goals",
+    "rewards",
+    "nextjs",
+    "chakra-ui",
+    "react",
+    "workplace",
+    "mindfulness",
+    "work-life-balance",
+    "employee-management",
+    "team-collaboration"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.0",
