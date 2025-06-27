@@ -15,7 +15,6 @@ import {
   MenuItem,
   MenuDivider,
   useColorModeValue,
-  Avatar,
   Tooltip,
   Button
 } from "@chakra-ui/react";
@@ -23,6 +22,7 @@ import WorkZenLogo from "./WorkZenLogoImage";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
+import { useAuth } from "../contexts/AuthContext";
 import { 
   FaChartBar, 
   FaUsers, 
@@ -40,18 +40,28 @@ import {
   FaDownload,
   FaTrophy,
   FaBullseye,
-  FaHeart
+  FaHeart,
+  FaTasks
 } from "react-icons/fa";
 
 const MotionBox = motion(Box);
 
-const links = [
-  { href: "/dashboard", icon: FaChartBar, label: "Dashboard", badge: null },
+// Manager/Admin links - can see everything
+const managerLinks = [
+  { href: "/admin/dashboard-simple", icon: FaChartBar, label: "Dashboard", badge: null },
   { href: "/employees", icon: FaUsers, label: "Employees", badge: "6" },
   { href: "/reports", icon: FaFileAlt, label: "Reports", badge: "3" },
-  { href: "/rewards", icon: FaTrophy, label: "Rewards", badge: "New", badgeColor: "orange" },
-  { href: "/goals", icon: FaBullseye, label: "Goals", badge: "4", badgeColor: "green" },
-  { href: "/wellness", icon: FaHeart, label: "Wellness", badge: null },
+  { href: "/admin/rewards", icon: FaTrophy, label: "Team Rewards", badge: "5", badgeColor: "orange" },
+  { href: "/wellness", icon: FaHeart, label: "Team Wellness", badge: null },
+];
+
+// Employee links - only personal stuff, no team management
+const employeeLinks = [
+  { href: "/employee/dashboard", icon: FaChartBar, label: "My Dashboard", badge: null },
+  { href: "/employee/tasks", icon: FaTasks, label: "My Tasks", badge: "5", badgeColor: "blue" },
+  { href: "/goals", icon: FaBullseye, label: "My Goals", badge: "2", badgeColor: "green" },
+  { href: "/rewards", icon: FaTrophy, label: "My Rewards", badge: "3", badgeColor: "orange" },
+  { href: "/wellness", icon: FaHeart, label: "My Wellness", badge: null },
 ];
 
 const bottomLinks = [
@@ -62,8 +72,12 @@ const bottomLinks = [
 export default function Sidebar() {
   const router = useRouter();
   const { colorMode, toggleColorMode } = useColorMode();
+  const { user, logout } = useAuth();
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  
+  // Select appropriate links based on user role
+  const links = user?.role === 'manager' ? managerLinks : employeeLinks;
   
   const linkVariants = {
     inactive: {
@@ -84,10 +98,17 @@ export default function Sidebar() {
   };
 
   const isActiveRoute = (href) => {
+    if (href === "/admin/dashboard-simple" || href === "/employee/dashboard") {
+      return router.pathname === href;
+    }
     if (href === "/dashboard") {
       return router.pathname === "/dashboard" || router.pathname === "/";
     }
     return router.pathname.startsWith(href);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -232,51 +253,6 @@ export default function Sidebar() {
                       </MenuItem>
                     </MenuList>
                   </Menu>
-
-                  {/* User Menu */}
-                  <Menu>
-                    <MenuButton
-                      as={Avatar}
-                      name="Alice Johnson"
-                      size="lg"
-                      src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alice"
-                      cursor="pointer"
-                      border="2px solid rgba(255,255,255,0.3)"
-                      _hover={{ 
-                        borderColor: "rgba(255,255,255,0.6)",
-                        boxShadow: "0 0 0 2px rgba(255,255,255,0.2)"
-                      }}
-                    />
-                    <MenuList borderRadius="lg" border="1px solid" borderColor={borderColor}>
-                      <Box px={4} py={3} borderBottom="1px solid" borderColor={borderColor}>
-                        <HStack>
-                          <Avatar 
-                            name="Alice Johnson" 
-                            size="sm" 
-                            src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alice"
-                          />
-                          <VStack align="flex-start" spacing={0}>
-                            <Text fontWeight="semibold" fontSize="sm">Alice Johnson</Text>
-                            <Text fontSize="xs" color="gray.500">alice@workzen.com</Text>
-                          </VStack>
-                        </HStack>
-                      </Box>
-                      
-                      <MenuItem icon={<FaUser />} fontSize="sm">
-                        View Profile
-                      </MenuItem>
-                      <MenuItem icon={<FaCog />} fontSize="sm">
-                        Settings
-                      </MenuItem>
-                      <MenuItem icon={<FaQuestionCircle />} fontSize="sm">
-                        Help & Support
-                      </MenuItem>
-                      <MenuDivider />
-                      <MenuItem icon={<FaSignOutAlt />} fontSize="sm" color="red.500">
-                        Sign Out
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
                 </HStack>
               </VStack>
             </MotionBox>
@@ -292,7 +268,7 @@ export default function Sidebar() {
                 mb={2}
                 px={3}
               >
-                Main Menu
+                {user?.role === 'manager' ? 'Management' : 'My Workspace'}
               </Text>
               <VStack spacing={1} align="stretch">
                 {links.map(({ href, icon, label, badge, badgeColor }, index) => (

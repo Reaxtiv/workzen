@@ -18,12 +18,50 @@ import {
 import { motion } from "framer-motion";
 import { FaDownload, FaFileExport, FaChartLine } from "react-icons/fa";
 import Layout from "../components/Layout";
+import { useAuth } from "../contexts/AuthContext";
 
 const MotionBox = motion(Box);
 
 export default function Profile() {
+  const { user } = useAuth();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
+
+  // Si no hay usuario, mostrar loading o redirigir
+  if (!user) {
+    return (
+      <Layout>
+        <Box p={8}>
+          <Text>Loading...</Text>
+        </Box>
+      </Layout>
+    );
+  }
+
+  // Datos específicos según el rol
+  const getUserStats = () => {
+    if (user.role === 'manager') {
+      return {
+        productivity: 95,
+        tasksCompleted: 156,
+        teamManaged: 24,
+        totalHours: 48.5,
+        badges: ['Team Leader', 'HR Expert'],
+        wallet: '0x8B2F...C9D1'
+      };
+    } else {
+      return {
+        productivity: 88,
+        tasksCompleted: 85,
+        totalHours: 42.0,
+        weeklyGoal: 40,
+        badges: ['Productive Worker', 'Goal Achiever'],
+        wallet: '0x4A7E...B3F8'
+      };
+    }
+  };
+
+  const userStats = getUserStats();
     return (
     <Layout>
       <Box bgGradient="linear(135deg, zen.50 0%, mindful.100 30%, zen.100 100%)" minH="100vh">
@@ -59,24 +97,33 @@ export default function Profile() {
             >
               <Flex align="center" gap={6}>
                 <Avatar 
-                  name="Alice Johnson" 
+                  name={user.name} 
                   size="2xl" 
-                  src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alice"
+                  src={user.avatar}
                   border="4px solid"
                   borderColor="zen.400"
                   boxShadow="0 8px 16px rgba(82, 160, 82, 0.2)"
                 />
                 <VStack align="start" spacing={2}>
                   <Heading fontSize="2xl" color={useColorModeValue("gray.700", "white")}>
-                    Alice Johnson
+                    {user.name}
                   </Heading>
-                  <Text fontSize="lg" color="gray.500">alice@workzen.com</Text>
+                  <Text fontSize="lg" color="gray.500">{user.email}</Text>
                   <HStack spacing={2}>
-                    <Badge colorScheme="green" fontSize="sm" px={3} py={1}>Product Manager</Badge>
-                    <Badge colorScheme="blue" fontSize="sm" px={3} py={1}>Team Lead</Badge>
+                    <Badge colorScheme="green" fontSize="sm" px={3} py={1}>
+                      {user.role === 'manager' ? 'Manager' : user.position}
+                    </Badge>
+                    <Badge colorScheme="blue" fontSize="sm" px={3} py={1}>
+                      {user.role === 'manager' ? 'Team Lead' : 'Employee'}
+                    </Badge>
+                    {userStats.badges.map((badge, index) => (
+                      <Badge key={index} colorScheme="purple" fontSize="sm" px={3} py={1}>
+                        {badge}
+                      </Badge>
+                    ))}
                   </HStack>
                   <Text fontSize="lg" color="gray.600">
-                    <strong>Wallet:</strong> 0x1234...abcd
+                    <strong>Wallet:</strong> {userStats.wallet}
                   </Text>
                   <Button colorScheme="green" size="lg" mt={2}>
                     Edit Profile
@@ -98,25 +145,43 @@ export default function Profile() {
             >
               <VStack align="stretch" spacing={4}>
                 <Heading size="md" color={useColorModeValue("gray.700", "white")}>
-                  This Week's Progress
+                  {user.role === 'manager' ? 'Management Overview' : 'This Week\'s Progress'}
                 </Heading>
                 <Divider />
                 
                 <VStack align="stretch" spacing={3}>
                   <Box>
                     <HStack justify="space-between" mb={2}>
-                      <Text fontWeight="medium" fontSize="lg">Tasks Completed</Text>
-                      <Text fontSize="lg" color="green.500">8/12</Text>
+                      <Text fontWeight="medium" fontSize="lg">
+                        {user.role === 'manager' ? 'Team Productivity' : 'Tasks Completed'}
+                      </Text>
+                      <Text fontSize="lg" color="green.500">
+                        {user.role === 'manager' ? '88%' : `${Math.floor(userStats.tasksCompleted * 0.7)}/${userStats.tasksCompleted}`}
+                      </Text>
                     </HStack>
-                    <Progress value={67} colorScheme="green" size="lg" borderRadius="md" />
+                    <Progress 
+                      value={user.role === 'manager' ? 88 : 67} 
+                      colorScheme="green" 
+                      size="lg" 
+                      borderRadius="md" 
+                    />
                   </Box>
                   
                   <Box>
                     <HStack justify="space-between" mb={2}>
-                      <Text fontWeight="medium" fontSize="lg">Focus Time</Text>
-                      <Text fontSize="lg" color="blue.500">32h</Text>
+                      <Text fontWeight="medium" fontSize="lg">
+                        {user.role === 'manager' ? 'Team Members' : 'Focus Time'}
+                      </Text>
+                      <Text fontSize="lg" color="blue.500">
+                        {user.role === 'manager' ? `${userStats.teamManaged}` : `${userStats.totalHours}h`}
+                      </Text>
                     </HStack>
-                    <Progress value={85} colorScheme="blue" size="lg" borderRadius="md" />
+                    <Progress 
+                      value={user.role === 'manager' ? 96 : 85} 
+                      colorScheme="blue" 
+                      size="lg" 
+                      borderRadius="md" 
+                    />
                   </Box>
                   
                   <Box>
@@ -151,32 +216,48 @@ export default function Profile() {
                   <HStack>
                     <Box fontSize="2xl">🏆</Box>
                     <VStack align="start" spacing={0}>
-                      <Text fontWeight="bold" fontSize="lg">Goal Crusher</Text>
-                      <Text fontSize="sm" color="gray.500">Completed 20 tasks this week</Text>
+                      <Text fontWeight="bold" fontSize="lg">
+                        {user.role === 'manager' ? 'Excellence Manager' : 'Goal Crusher'}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        {user.role === 'manager' ? 'Managed 24 team members successfully' : 'Completed 20 tasks this week'}
+                      </Text>
                     </VStack>
                   </HStack>
                   
                   <HStack>
                     <Box fontSize="2xl">🌟</Box>
                     <VStack align="start" spacing={0}>
-                      <Text fontWeight="bold" fontSize="lg">Team Player</Text>
-                      <Text fontSize="sm" color="gray.500">Helped 5 colleagues</Text>
+                      <Text fontWeight="bold" fontSize="lg">
+                        {user.role === 'manager' ? 'Team Builder' : 'Team Player'}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        {user.role === 'manager' ? 'Built high-performing teams' : 'Helped 5 colleagues'}
+                      </Text>
                     </VStack>
                   </HStack>
                   
                   <HStack>
                     <Box fontSize="2xl">🎯</Box>
                     <VStack align="start" spacing={0}>
-                      <Text fontWeight="bold" fontSize="lg">Focus Master</Text>
-                      <Text fontSize="sm" color="gray.500">4 hours deep work session</Text>
+                      <Text fontWeight="bold" fontSize="lg">
+                        {user.role === 'manager' ? 'Strategic Leader' : 'Focus Master'}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        {user.role === 'manager' ? 'Achieved 95% team productivity' : '4 hours deep work session'}
+                      </Text>
                     </VStack>
                   </HStack>
                   
                   <HStack>
                     <Box fontSize="2xl">🚀</Box>
                     <VStack align="start" spacing={0}>
-                      <Text fontWeight="bold" fontSize="lg">Innovation</Text>
-                      <Text fontSize="sm" color="gray.500">Proposed 3 new ideas</Text>
+                      <Text fontWeight="bold" fontSize="lg">
+                        {user.role === 'manager' ? 'Growth Catalyst' : 'Innovation'}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        {user.role === 'manager' ? 'Improved team efficiency by 15%' : 'Proposed 3 new ideas'}
+                      </Text>
                     </VStack>
                   </HStack>
                 </VStack>
@@ -254,7 +335,9 @@ export default function Profile() {
                   <HStack>
                     <Box w="8px" h="8px" bg="green.400" borderRadius="full" />
                     <VStack align="start" spacing={0} flex={1}>
-                      <Text fontWeight="medium" fontSize="lg">Completed task: Website Redesign</Text>
+                      <Text fontWeight="medium" fontSize="lg">
+                        {user.role === 'manager' ? 'Reviewed team performance reports' : 'Completed task: Website Redesign'}
+                      </Text>
                       <Text fontSize="sm" color="gray.500">2 hours ago</Text>
                     </VStack>
                   </HStack>
@@ -262,7 +345,9 @@ export default function Profile() {
                   <HStack>
                     <Box w="8px" h="8px" bg="blue.400" borderRadius="full" />
                     <VStack align="start" spacing={0} flex={1}>
-                      <Text fontWeight="medium" fontSize="lg">Started collaboration with Design Team</Text>
+                      <Text fontWeight="medium" fontSize="lg">
+                        {user.role === 'manager' ? 'Conducted team strategy meeting' : 'Started collaboration with Design Team'}
+                      </Text>
                       <Text fontSize="sm" color="gray.500">5 hours ago</Text>
                     </VStack>
                   </HStack>
@@ -270,7 +355,9 @@ export default function Profile() {
                   <HStack>
                     <Box w="8px" h="8px" bg="purple.400" borderRadius="full" />
                     <VStack align="start" spacing={0} flex={1}>
-                      <Text fontWeight="medium" fontSize="lg">Achieved weekly productivity goal</Text>
+                      <Text fontWeight="medium" fontSize="lg">
+                        {user.role === 'manager' ? 'Approved quarterly budget allocation' : 'Achieved weekly productivity goal'}
+                      </Text>
                       <Text fontSize="sm" color="gray.500">1 day ago</Text>
                     </VStack>
                   </HStack>
@@ -278,7 +365,9 @@ export default function Profile() {
                   <HStack>
                     <Box w="8px" h="8px" bg="orange.400" borderRadius="full" />
                     <VStack align="start" spacing={0} flex={1}>
-                      <Text fontWeight="medium" fontSize="lg">Updated profile settings</Text>
+                      <Text fontWeight="medium" fontSize="lg">
+                        {user.role === 'manager' ? 'Updated team management settings' : 'Updated profile settings'}
+                      </Text>
                       <Text fontSize="sm" color="gray.500">2 days ago</Text>
                     </VStack>
                   </HStack>

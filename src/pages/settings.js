@@ -19,12 +19,25 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Layout from "../components/Layout";
+import { useAuth } from "../contexts/AuthContext";
 
 const MotionBox = motion(Box);
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
+
+  // Si no hay usuario, mostrar loading
+  if (!user) {
+    return (
+      <Layout>
+        <Box p={8}>
+          <Text>Loading...</Text>
+        </Box>
+      </Layout>
+    );
+  }
     return (
     <Layout>
       <Box bgGradient="linear(135deg, zen.50 0%, mindful.100 30%, zen.100 100%)" minH="100vh">
@@ -110,27 +123,29 @@ export default function SettingsPage() {
                 
                 <HStack>
                   <Avatar 
-                    name="Alice Johnson" 
+                    name={user.name} 
                     size="lg" 
-                    src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alice"
+                    src={user.avatar}
                     border="3px solid"
                     borderColor="zen.400"
                     boxShadow="0 4px 12px rgba(82, 160, 82, 0.2)"
                   />
                   <VStack align="start" spacing={1}>
-                    <Text fontWeight="bold" fontSize="lg">Alice Johnson</Text>
-                    <Badge colorScheme="green" fontSize="sm">Product Manager</Badge>
+                    <Text fontWeight="bold" fontSize="lg">{user.name}</Text>
+                    <Badge colorScheme="green" fontSize="sm">
+                      {user.role === 'manager' ? 'Manager' : user.position}
+                    </Badge>
                   </VStack>
                 </HStack>
                 
                 <FormControl>
                   <FormLabel fontSize="lg" fontWeight="medium">Display Name</FormLabel>
-                  <Input placeholder="Alice Johnson" fontSize="lg" />
+                  <Input placeholder={user.name} fontSize="lg" />
                 </FormControl>
                 
                 <FormControl>
                   <FormLabel fontSize="lg" fontWeight="medium">Email</FormLabel>
-                  <Input placeholder="alice@workzen.com" fontSize="lg" />
+                  <Input placeholder={user.email} fontSize="lg" />
                 </FormControl>
                 
                 <Button colorScheme="green" size="lg">

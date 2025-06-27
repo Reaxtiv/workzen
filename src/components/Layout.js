@@ -12,7 +12,8 @@ export default function Layout({ children }) {
     <Box minH="100vh" bg={bg}>
       <Sidebar />
       <TopBar />      <MotionBox
-        ml="320px"
+        ml="280px"
+        pt="60px"
         p={8}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
