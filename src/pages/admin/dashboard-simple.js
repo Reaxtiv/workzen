@@ -1,5 +1,6 @@
 import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/Layout';
+import BlockchainReports from '../../components/BlockchainReports';
 import { 
   Box, 
   Heading, 
@@ -315,6 +316,16 @@ export default function AdminDashboard() {
                   </Tbody>
                 </Table>
               </Box>
+
+              {/* Blockchain Reports for Admin */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                mt={6}
+              >
+                <BlockchainReports userRole="admin" />
+              </MotionBox>
             </MotionBox>
           </Container>
         </Box>

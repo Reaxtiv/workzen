@@ -1,5 +1,8 @@
 import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/Layout';
+import RealTimeMonitor from '../../components/RealTimeMonitor';
+import BlockchainReports from '../../components/BlockchainReports';
+import { useProductivityMetrics } from '../../hooks/useProductivityMetrics';
 import { 
   Box, 
   Heading, 
@@ -22,12 +25,17 @@ import {
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { FaTasks, FaChartLine, FaTrophy, FaCalendarCheck } from 'react-icons/fa';
+import { FaTasks, FaChartLine, FaTrophy, FaCalendarCheck, FaClock, FaFire } from 'react-icons/fa';
 
 const MotionBox = motion(Box);
 
 const EmployeeDashboard = () => {
   const { user } = useAuth();
+  const { 
+    metrics, 
+    hasRealData, 
+    isMonitoring
+  } = useProductivityMetrics();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
 
@@ -105,11 +113,11 @@ const EmployeeDashboard = () => {
                           <Icon as={FaChartLine} boxSize={6} />
                         </Box>
                         <Stat>
-                          <StatLabel>My Productivity</StatLabel>
-                          <StatNumber>88%</StatNumber>
+                          <StatLabel>My Productivity {hasRealData && <Badge colorScheme="green" fontSize="xs">LIVE</Badge>}</StatLabel>
+                          <StatNumber>{metrics.productivity}%</StatNumber>
                           <StatHelpText>
-                            <StatArrow type="increase" />
-                            12% from last week
+                            <StatArrow type={metrics.productivity >= 88 ? "increase" : "decrease"} />
+                            {hasRealData ? 'Real-time data' : '12% from last week'}
                           </StatHelpText>
                         </Stat>
                       </HStack>
@@ -133,11 +141,11 @@ const EmployeeDashboard = () => {
                           <Icon as={FaTasks} boxSize={6} />
                         </Box>
                         <Stat>
-                          <StatLabel>Tasks Completed</StatLabel>
-                          <StatNumber>24</StatNumber>
+                          <StatLabel>Tasks Completed {hasRealData && <Badge colorScheme="blue" fontSize="xs">LIVE</Badge>}</StatLabel>
+                          <StatNumber>{metrics.tasksCompleted}</StatNumber>
                           <StatHelpText>
                             <StatArrow type="increase" />
-                            6 this week
+                            {hasRealData ? `Based on ${metrics.focusTime.toFixed(1)}h focus time` : '6 this week'}
                           </StatHelpText>
                         </Stat>
                       </HStack>
@@ -158,14 +166,14 @@ const EmployeeDashboard = () => {
                           bg="purple.50"
                           color="purple.500"
                         >
-                          <Icon as={FaTrophy} boxSize={6} />
+                          <Icon as={FaClock} boxSize={6} />
                         </Box>
                         <Stat>
-                          <StatLabel>Wellness Score</StatLabel>
-                          <StatNumber>94%</StatNumber>
+                          <StatLabel>Daily Progress {hasRealData && <Badge colorScheme="purple" fontSize="xs">LIVE</Badge>}</StatLabel>
+                          <StatNumber>{metrics.dailyGoalProgress}%</StatNumber>
                           <StatHelpText>
-                            <StatArrow type="increase" />
-                            Great balance!
+                            <StatArrow type={metrics.dailyGoalProgress >= 75 ? "increase" : "decrease"} />
+                            {hasRealData ? `${metrics.focusTime.toFixed(1)}h of 8h goal` : 'Great balance!'}
                           </StatHelpText>
                         </Stat>
                       </HStack>
@@ -186,13 +194,13 @@ const EmployeeDashboard = () => {
                           bg="orange.50"
                           color="orange.500"
                         >
-                          <Icon as={FaCalendarCheck} boxSize={6} />
+                          <Icon as={FaFire} boxSize={6} />
                         </Box>
                         <Stat>
-                          <StatLabel>Goals Progress</StatLabel>
-                          <StatNumber>75%</StatNumber>
+                          <StatLabel>Breaks Today {hasRealData && <Badge colorScheme="orange" fontSize="xs">LIVE</Badge>}</StatLabel>
+                          <StatNumber>{metrics.breaksToday}</StatNumber>
                           <StatHelpText>
-                            On track
+                            {hasRealData ? (metrics.breaksToday <= 5 ? 'Good balance' : 'Consider fewer breaks') : 'On track'}
                           </StatHelpText>
                         </Stat>
                       </HStack>
@@ -278,6 +286,26 @@ const EmployeeDashboard = () => {
                     </VStack>
                   </CardBody>
                 </Card>
+              </MotionBox>
+
+              {/* Real-Time PC Monitor */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                mt={6}
+              >
+                <RealTimeMonitor />
+              </MotionBox>
+
+              {/* Blockchain Reports */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                mt={6}
+              >
+                <BlockchainReports userRole="employee" />
               </MotionBox>
 
               {/* Quick Actions for Employee */}

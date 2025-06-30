@@ -65,20 +65,20 @@ const AdminRewards = () => {
 
   // Mock data for admin rewards management
   const rewardStats = {
-    totalPointsAwarded: 2450,
+    totalZensAwarded: 2450,
     totalRedeemed: 1800,
     availableRewards: 12,
     pendingRequests: 5
   };
 
-  const employeePoints = [
+  const employeeZens = [
     {
       id: 3,
       name: 'Alice Johnson',
       position: 'Senior Developer',
-      totalPoints: 850,
-      redeemedPoints: 300,
-      availablePoints: 550,
+      totalZens: 850,
+      redeemedZens: 300,
+      availableZens: 550,
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Alice',
       lastActivity: '2024-12-27'
     },
@@ -86,9 +86,9 @@ const AdminRewards = () => {
       id: 4,
       name: 'Bob Martinez',
       position: 'UX Designer',
-      totalPoints: 720,
-      redeemedPoints: 450,
-      availablePoints: 270,
+      totalZens: 720,
+      redeemedZens: 450,
+      availableZens: 270,
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Bob',
       lastActivity: '2024-12-26'
     },
@@ -96,9 +96,9 @@ const AdminRewards = () => {
       id: 5,
       name: 'Carol Smith',
       position: 'Product Manager',
-      totalPoints: 880,
-      redeemedPoints: 200,
-      availablePoints: 680,
+      totalZens: 880,
+      redeemedZens: 200,
+      availableZens: 680,
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Carol',
       lastActivity: '2024-12-28'
     }
@@ -152,7 +152,7 @@ const AdminRewards = () => {
       id: 1,
       employee: 'Alice Johnson',
       reward: 'Extra Day Off',
-      points: 500,
+      zens: 500,
       requestDate: '2024-12-27',
       status: 'pending',
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Alice'
@@ -161,7 +161,7 @@ const AdminRewards = () => {
       id: 2,
       employee: 'Bob Martinez',
       reward: 'Coffee Shop Gift Card',
-      points: 250,
+      zens: 250,
       requestDate: '2024-12-26',
       status: 'pending',
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Bob'
@@ -207,7 +207,7 @@ const AdminRewards = () => {
                     Team Rewards Management
                   </Heading>
                   <Text color="gray.600" fontSize="lg">
-                    Manage rewards, track points, and approve redemptions
+                    Manage rewards, track zens, and approve redemptions
                   </Text>
                 </Box>
                 <VStack spacing={2}>
@@ -226,7 +226,7 @@ const AdminRewards = () => {
                     colorScheme="zen"
                     size="md"
                   >
-                    Award Points
+                    Award Zens
                   </Button>
                 </VStack>
               </Flex>
@@ -245,8 +245,8 @@ const AdminRewards = () => {
                         <Icon as={FaCoins} boxSize={6} />
                       </Box>
                       <Stat>
-                        <StatLabel>Total Points Awarded</StatLabel>
-                        <StatNumber>{rewardStats.totalPointsAwarded}</StatNumber>
+                        <StatLabel>Total Zens Awarded</StatLabel>
+                        <StatNumber>{rewardStats.totalZensAwarded}</StatNumber>
                         <StatHelpText>
                           <StatArrow type="increase" />
                           +15% this month
@@ -268,7 +268,7 @@ const AdminRewards = () => {
                         <Icon as={FaGift} boxSize={6} />
                       </Box>
                       <Stat>
-                        <StatLabel>Points Redeemed</StatLabel>
+                        <StatLabel>Zens Redeemed</StatLabel>
                         <StatNumber>{rewardStats.totalRedeemed}</StatNumber>
                         <StatHelpText>
                           <StatArrow type="increase" />
@@ -328,7 +328,7 @@ const AdminRewards = () => {
               <Tabs variant="enclosed" colorScheme="zen">
                 <TabList>
                   <Tab>Pending Requests</Tab>
-                  <Tab>Employee Points</Tab>
+                  <Tab>Employee Zens</Tab>
                   <Tab>Reward Catalog</Tab>
                 </TabList>
 
@@ -359,7 +359,7 @@ const AdminRewards = () => {
                                     <Text color="gray.600">wants to redeem: {request.reward}</Text>
                                     <HStack spacing={2}>
                                       <Icon as={FaCoins} color="yellow.500" />
-                                      <Text fontSize="sm">{request.points} points</Text>
+                                      <Text fontSize="sm">{request.zens} zens</Text>
                                       <Text fontSize="sm" color="gray.500">• {request.requestDate}</Text>
                                     </HStack>
                                   </VStack>
@@ -410,7 +410,7 @@ const AdminRewards = () => {
                             </Tr>
                           </Thead>
                           <Tbody>
-                            {employeePoints.map((employee) => (
+                            {employeeZens.map((employee) => (
                               <Tr key={employee.id}>
                                 <Td>
                                   <HStack spacing={3}>
@@ -424,14 +424,14 @@ const AdminRewards = () => {
                                 <Td>
                                   <HStack>
                                     <Icon as={FaCoins} color="yellow.500" />
-                                    <Text fontWeight="bold">{employee.totalPoints}</Text>
+                                    <Text fontWeight="bold">{employee.totalZens}</Text>
                                   </HStack>
                                 </Td>
                                 <Td>
-                                  <Text color="red.500">{employee.redeemedPoints}</Text>
+                                  <Text color="red.500">{employee.redeemedZens}</Text>
                                 </Td>
                                 <Td>
-                                  <Text color="green.500" fontWeight="bold">{employee.availablePoints}</Text>
+                                  <Text color="green.500" fontWeight="bold">{employee.availableZens}</Text>
                                 </Td>
                                 <Td>
                                   <Text fontSize="sm" color="gray.500">{employee.lastActivity}</Text>
@@ -498,7 +498,7 @@ const AdminRewards = () => {
                                     <HStack justify="space-between" mb={2}>
                                       <HStack>
                                         <Icon as={FaCoins} color="yellow.500" />
-                                        <Text fontWeight="bold">{reward.cost} pts</Text>
+                                        <Text fontWeight="bold">{reward.cost} zens</Text>
                                       </HStack>
                                       <Badge variant="outline">{reward.availability}</Badge>
                                     </HStack>

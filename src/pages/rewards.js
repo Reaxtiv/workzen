@@ -60,8 +60,8 @@ const MotionBox = motion(Box);
 
 // Mock data
 const userStats = {
-  totalTokens: 2450,
-  weeklyTokens: 180,
+  totalZens: 2450,
+  weeklyZens: 180,
   monthlyRank: 3,
   totalRewards: 12,
   streak: 7
@@ -143,7 +143,7 @@ const achievements = [
     description: "Complete your first week with 100% productivity", 
     icon: FaMedal,
     unlocked: true,
-    tokens: 100,
+    zens: 100,
     date: "2024-12-15"
   },
   { 
@@ -152,7 +152,7 @@ const achievements = [
     description: "Maintain productivity streak for 30 days", 
     icon: FaCrown,
     unlocked: true,
-    tokens: 250,
+    zens: 250,
     date: "2024-12-20"
   },
   { 
@@ -161,7 +161,7 @@ const achievements = [
     description: "Help 5 team members reach their goals", 
     icon: FaAward,
     unlocked: false,
-    tokens: 200,
+    zens: 200,
     progress: 60
   },
   { 
@@ -170,7 +170,7 @@ const achievements = [
     description: "Exceed daily target by 50% for 5 days", 
     icon: FaRocket,
     unlocked: false,
-    tokens: 300,
+    zens: 300,
     progress: 20
   }
 ];
@@ -180,38 +180,38 @@ const recentActivity = [
     id: 1, 
     type: "earned", 
     description: "Daily productivity bonus", 
-    tokens: 25, 
+    zens: 25, 
     date: "Today" 
   },
   { 
     id: 2, 
     type: "redeemed", 
     description: "Premium Coffee reward", 
-    tokens: -50, 
+    zens: -50, 
     date: "Yesterday" 
   },
   { 
     id: 3, 
     type: "achievement", 
     description: "Consistency King badge earned", 
-    tokens: 250, 
+    zens: 250, 
     date: "2 days ago" 
   },
   { 
     id: 4, 
     type: "earned", 
     description: "Weekly target completion", 
-    tokens: 100, 
+    zens: 100, 
     date: "3 days ago" 
   }
 ];
 
 const leaderboard = [
-  { rank: 1, name: "David Wilson", tokens: 3200, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=David" },
-  { rank: 2, name: "Emma Brown", tokens: 2890, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Emma" },
-  { rank: 3, name: "You", tokens: 2450, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Current", isCurrentUser: true },
-  { rank: 4, name: "Alice Johnson", tokens: 2200, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Alice" },
-  { rank: 5, name: "Bob Martinez", tokens: 1950, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Bob" }
+  { rank: 1, name: "David Wilson", zens: 3200, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=David" },
+  { rank: 2, name: "Emma Brown", zens: 2890, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Emma" },
+  { rank: 3, name: "You", zens: 2450, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Current", isCurrentUser: true },
+  { rank: 4, name: "Alice Johnson", zens: 2200, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Alice" },
+  { rank: 5, name: "Bob Martinez", zens: 1950, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Bob" }
 ];
 
 export default function RewardsPage() {
@@ -239,7 +239,7 @@ export default function RewardsPage() {
     onOpen();
   };
 
-  const canAfford = (cost) => userStats.totalTokens >= cost;
+  const canAfford = (cost) => userStats.totalZens >= cost;
 
   return (
     <Layout>
@@ -259,7 +259,7 @@ export default function RewardsPage() {
                 </Heading>
               </Flex>
               <Text color="gray.500" fontSize="lg">
-                Earn tokens through productivity and redeem amazing rewards
+                Earn zens through productivity and redeem amazing rewards
               </Text>
             </VStack>
           </MotionBox>
@@ -274,8 +274,8 @@ export default function RewardsPage() {
                 <VStack textAlign="center">
                   <Icon as={FaCoins} boxSize={6} color="yellow.500" mb={2} />
                   <Stat>
-                    <StatNumber color={accentColor}>{userStats.totalTokens}</StatNumber>
-                    <StatLabel>Total Tokens</StatLabel>
+                    <StatNumber color={accentColor}>{userStats.totalZens}</StatNumber>
+                    <StatLabel>Total Zens</StatLabel>
                   </Stat>
                 </VStack>
               </Box>
@@ -284,7 +284,7 @@ export default function RewardsPage() {
                 <VStack textAlign="center">
                   <Icon as={FaStar} boxSize={6} color="orange.500" mb={2} />
                   <Stat>
-                    <StatNumber color={accentColor}>{userStats.weeklyTokens}</StatNumber>
+                    <StatNumber color={accentColor}>{userStats.weeklyZens}</StatNumber>
                     <StatLabel>This Week</StatLabel>
                   </Stat>
                 </VStack>
@@ -418,7 +418,7 @@ export default function RewardsPage() {
                               isDisabled={!canAfford(reward.cost) || reward.stock === 0}
                               leftIcon={<FaShoppingCart />}
                             >
-                              {!canAfford(reward.cost) ? "Insufficient Tokens" : 
+                              {!canAfford(reward.cost) ? "Insufficient Zens" : 
                                reward.stock === 0 ? "Out of Stock" : "Redeem"}
                             </Button>
                           </VStack>
@@ -453,7 +453,7 @@ export default function RewardsPage() {
                               <HStack>
                                 <Icon as={FaCoins} color="yellow.500" boxSize={3} />
                                 <Text fontWeight="bold" fontSize="sm">
-                                  {achievement.tokens}
+                                  {achievement.zens}
                                 </Text>
                               </HStack>
                             </HStack>
@@ -507,9 +507,9 @@ export default function RewardsPage() {
                               <Icon as={FaCoins} color="yellow.500" />
                               <Text 
                                 fontWeight="bold" 
-                                color={activity.tokens > 0 ? "green.500" : "red.500"}
+                                color={activity.zens > 0 ? "green.500" : "red.500"}
                               >
-                                {activity.tokens > 0 ? "+" : ""}{activity.tokens}
+                                {activity.zens > 0 ? "+" : ""}{activity.zens}
                               </Text>
                             </HStack>
                           </Flex>
@@ -564,7 +564,7 @@ export default function RewardsPage() {
                             <HStack>
                               <Icon as={FaCoins} color="yellow.500" />
                               <Text fontWeight="bold" color={textColor}>
-                                {user.tokens.toLocaleString()}
+                                {user.zens.toLocaleString()}
                               </Text>
                             </HStack>
                           </Flex>
@@ -601,7 +601,7 @@ export default function RewardsPage() {
                   <Text>Cost:</Text>
                   <HStack>
                     <Icon as={FaCoins} color="yellow.500" />
-                    <Text fontWeight="bold">{selectedReward.cost} tokens</Text>
+                    <Text fontWeight="bold">{selectedReward.cost} zens</Text>
                   </HStack>
                 </HStack>
                 
@@ -621,7 +621,7 @@ export default function RewardsPage() {
                   <Text>Your balance:</Text>
                   <HStack>
                     <Icon as={FaCoins} color="yellow.500" />
-                    <Text fontWeight="bold">{userStats.totalTokens} tokens</Text>
+                    <Text fontWeight="bold">{userStats.totalZens} zens</Text>
                   </HStack>
                 </HStack>
                 
@@ -632,7 +632,7 @@ export default function RewardsPage() {
                   isDisabled={!canAfford(selectedReward.cost) || selectedReward.stock === 0}
                   leftIcon={<FaExchangeAlt />}
                 >
-                  {!canAfford(selectedReward.cost) ? "Insufficient Tokens" : 
+                  {!canAfford(selectedReward.cost) ? "Insufficient Zens" : 
                    selectedReward.stock === 0 ? "Out of Stock" : "Confirm Redemption"}
                 </Button>
               </VStack>

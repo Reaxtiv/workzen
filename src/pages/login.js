@@ -6,44 +6,44 @@ import {
   HStack,
   Heading, 
   Text, 
-  Input, 
   Button, 
   Alert,
   AlertIcon,
   useColorModeValue,
-  FormControl,
-  FormLabel,
-  InputGroup,
-  InputRightElement,
-  IconButton,
   Spinner,
   Badge,
-  Divider,
   useToast,
   Container,
-  Checkbox,
   Card,
   CardBody,
   SimpleGrid,
-  Image
+  Image,
+  Select,
+  Link,
+  Icon
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { FaEye, FaEyeSlash, FaUser, FaLock, FaUserTie, FaUsers, FaShieldAlt } from "react-icons/fa";
+import { FaWallet, FaShieldAlt, FaExternalLinkAlt, FaUserTie, FaUsers, FaDownload } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
+import { useMetaMask } from "../hooks/useMetaMask";
 import { useRouter } from "next/router";
 
 const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   
-  const { login, user } = useAuth();
+  const { loginWithWallet, user } = useAuth();
+  const { 
+    account, 
+    isConnecting, 
+    error: walletError, 
+    isMetaMaskInstalled, 
+    connectWallet,
+    isConnected 
+  } = useMetaMask();
   const router = useRouter();
   const toast = useToast();
 
@@ -62,22 +62,29 @@ export default function Login() {
     }
   }, [user, router]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-    
-    // Basic validation
-    if (!email || !password) {
-      setError('Please fill in all fields');
-      setIsLoading(false);
-      return;
+  // Auto-login when wallet connects and role is selected
+  useEffect(() => {
+    if (isConnected && account && selectedRole && !isLoggingIn) {
+      handleWalletLogin();
     }
+  }, [isConnected, account, selectedRole]);
 
+  const handleWalletLogin = async () => {
+    if (!account) return;
+    
+    setIsLoggingIn(true);
+    
     try {
-      const result = login(email, password);
-      if (!result.success) {
-        setError(result.error);
+      const result = await loginWithWallet(account, selectedRole);
+      if (result.success) {
+        toast({
+          title: "Welcome to WorkZen!",
+          description: `Connected with wallet as ${selectedRole}`,
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
         toast({
           title: "Login Failed",
           description: result.error,
@@ -85,41 +92,44 @@ export default function Login() {
           duration: 3000,
           isClosable: true,
         });
-      } else {
-        toast({
-          title: "Welcome to WorkZen!",
-          description: "Login successful. Redirecting...",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to login with wallet",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     } finally {
-      setIsLoading(false);
+      setIsLoggingIn(false);
     }
   };
 
-  const handleDemoLogin = (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword('password123');
-    setIsLoading(true);
-    
-    // Auto-submit demo login
-    setTimeout(() => {
-      const result = login(demoEmail, 'password123');
-      if (result.success) {
-        toast({
-          title: "Demo Login Successful!",
-          description: `Welcome to WorkZen as ${demoEmail.includes('admin') ? 'Manager' : 'Employee'}`,
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
-      }
-      setIsLoading(false);
-    }, 1000);
+  const handleConnectWallet = async () => {
+    if (!selectedRole) {
+      toast({
+        title: "Please select a role",
+        description: "Choose whether you're connecting as a Manager or Employee",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    await connectWallet();
+  };
+
+  const handleDemoLogin = (role) => {
+    setSelectedRole(role);
+    // If wallet is already connected, login immediately
+    if (isConnected && account) {
+      handleWalletLogin();
+    } else {
+      // Otherwise, connect wallet first
+      connectWallet();
+    }
   };
 
   if (user) {
@@ -202,7 +212,7 @@ export default function Login() {
                   </Heading>
                 </VStack>
                 <Text fontSize="lg" color={useColorModeValue("gray.800", "gray.100")} maxW="400px" lineHeight="1.4" fontWeight="semibold" textAlign="center">
-                  Empowering teams with mindful productivity and wellness-focused management
+                  Empowering teams with mindful productivity and Web3-secured analytics
                 </Text>
               </VStack>
 
@@ -269,7 +279,7 @@ export default function Login() {
                     fontSize="md"
                     fontWeight="medium"
                   >
-                    Cryptographic proof of achievements
+                    MetaMask wallet authentication
                   </Text>
                 </HStack>
                 <HStack spacing={3}>
@@ -291,7 +301,7 @@ export default function Login() {
               </VStack>
             </MotionVStack>
 
-            {/* Right side - Login Form */}
+            {/* Right side - Wallet Login */}
             <MotionBox
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -309,20 +319,20 @@ export default function Login() {
                   <VStack spacing={6}>
                     <VStack spacing={2}>
                       <Heading size="lg" color={textColor} textAlign="center">
-                        Welcome Back
+                        Connect Your Wallet
                       </Heading>
                       <Text color="gray.500" textAlign="center">
-                        Sign in to your WorkZen account
+                        Sign in to WorkZen with MetaMask
                       </Text>
                       <HStack spacing={2} pt={1}>
                         <FaShieldAlt color="#52A052" size="16px" />
                         <Text fontSize="xs" color="gray.400" textAlign="center">
-                          Secured with blockchain technology
+                          Secured with Web3 technology
                         </Text>
                       </HStack>
                     </VStack>
 
-                    {error && (
+                    {(walletError || (!isMetaMaskInstalled && !isConnecting)) && (
                       <MotionBox
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -330,25 +340,48 @@ export default function Login() {
                       >
                         <Alert status="error" borderRadius="md">
                           <AlertIcon />
-                          {error}
+                          {!isMetaMaskInstalled ? 
+                            "MetaMask is not installed. Please install MetaMask to continue." : 
+                            walletError
+                          }
                         </Alert>
                       </MotionBox>
                     )}
 
-                    <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-                      <VStack spacing={4}>
-                        <FormControl isInvalid={error && !email}>
-                          <FormLabel color={textColor}>
-                            <HStack>
-                              <FaUser />
-                              <Text>Email Address</Text>
-                            </HStack>
-                          </FormLabel>
-                          <Input 
-                            type="email" 
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                    {!isMetaMaskInstalled ? (
+                      <VStack spacing={4} w="full">
+                        <Button 
+                          leftIcon={<FaDownload />}
+                          rightIcon={<FaExternalLinkAlt />}
+                          colorScheme="orange"
+                          size="lg"
+                          w="full"
+                          as={Link}
+                          href="https://metamask.io/download/"
+                          isExternal
+                          _hover={{
+                            transform: "translateY(-1px)",
+                            boxShadow: "lg"
+                          }}
+                          transition="all 0.2s"
+                        >
+                          Install MetaMask
+                        </Button>
+                        <Text fontSize="sm" color="gray.500" textAlign="center">
+                          MetaMask is required to access WorkZen
+                        </Text>
+                      </VStack>
+                    ) : (
+                      <VStack spacing={4} w="full">
+                        {/* Role Selection */}
+                        <Box w="full">
+                          <Text fontSize="sm" color={textColor} mb={2} fontWeight="medium">
+                            Select your role:
+                          </Text>
+                          <Select 
+                            placeholder="Choose your role..."
+                            value={selectedRole}
+                            onChange={(e) => setSelectedRole(e.target.value)}
                             bg={useColorModeValue("gray.50", "gray.700")}
                             border="1px solid"
                             borderColor={borderColor}
@@ -358,63 +391,42 @@ export default function Login() {
                               boxShadow: "0 0 0 1px var(--chakra-colors-zen-500)" 
                             }}
                             size="lg"
-                          />
-                        </FormControl>
-
-                        <FormControl isInvalid={error && !password}>
-                          <FormLabel color={textColor}>
-                            <HStack>
-                              <FaLock />
-                              <Text>Password</Text>
-                            </HStack>
-                          </FormLabel>
-                          <InputGroup size="lg">
-                            <Input 
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter your password"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              bg={useColorModeValue("gray.50", "gray.700")}
-                              border="1px solid"
-                              borderColor={borderColor}
-                              _hover={{ borderColor: "zen.300" }}
-                              _focus={{ 
-                                borderColor: "zen.500", 
-                                boxShadow: "0 0 0 1px var(--chakra-colors-zen-500)" 
-                              }}
-                            />
-                            <InputRightElement>
-                              <IconButton
-                                aria-label={showPassword ? "Hide password" : "Show password"}
-                                icon={showPassword ? <FaEyeSlash /> : <FaEye />}
-                                onClick={() => setShowPassword(!showPassword)}
-                                variant="ghost"
-                                size="sm"
-                              />
-                            </InputRightElement>
-                          </InputGroup>
-                        </FormControl>
-
-                        <HStack justify="space-between" w="full">
-                          <Checkbox 
-                            isChecked={rememberMe} 
-                            onChange={(e) => setRememberMe(e.target.checked)}
-                            colorScheme="zen"
                           >
-                            <Text fontSize="sm" color={textColor}>Remember me</Text>
-                          </Checkbox>
-                          <Button variant="link" size="sm" color="zen.500">
-                            Forgot password?
-                          </Button>
-                        </HStack>
+                            <option value="manager">Manager</option>
+                            <option value="employee">Employee</option>
+                          </Select>
+                        </Box>
 
+                        {/* Wallet Connection Status */}
+                        {isConnected && account && (
+                          <Box 
+                            w="full" 
+                            p={3} 
+                            bg={useColorModeValue("green.50", "green.900")} 
+                            borderRadius="md"
+                            border="1px solid"
+                            borderColor={useColorModeValue("green.200", "green.700")}
+                          >
+                            <VStack spacing={1}>
+                              <Text fontSize="sm" fontWeight="medium" color="green.600">
+                                Wallet Connected
+                              </Text>
+                              <Text fontSize="xs" color="green.500" fontFamily="mono">
+                                {account.slice(0, 6)}...{account.slice(-4)}
+                              </Text>
+                            </VStack>
+                          </Box>
+                        )}
+
+                        {/* Connect/Login Button */}
                         <Button 
-                          type="submit" 
+                          leftIcon={<FaWallet />}
                           colorScheme="zen"
                           size="lg"
                           w="full"
-                          isLoading={isLoading}
-                          loadingText="Signing in..."
+                          isLoading={isConnecting || isLoggingIn}
+                          loadingText={isConnecting ? "Connecting..." : "Logging in..."}
+                          onClick={isConnected ? handleWalletLogin : handleConnectWallet}
                           bgGradient="linear(to-r, zen.400, zen.600)"
                           _hover={{
                             bgGradient: "linear(to-r, zen.500, zen.700)",
@@ -422,55 +434,48 @@ export default function Login() {
                             boxShadow: "lg"
                           }}
                           transition="all 0.2s"
+                          isDisabled={!selectedRole}
                         >
-                          Sign In to WorkZen
+                          {isConnected ? "Sign In to WorkZen" : "Connect MetaMask"}
                         </Button>
-                      </VStack>
-                    </form>
 
-                    <Divider />
-
-                    {/* Demo Accounts */}
-                    <VStack spacing={4} w="full">
-                      <Text fontSize="sm" color="gray.500" textAlign="center" fontWeight="medium">
-                        Try WorkZen with demo accounts
-                      </Text>
-                      
-                      <SimpleGrid columns={2} spacing={3} w="full">
-                        <Button
-                          size="md"
-                          variant="outline"
-                          leftIcon={<FaUserTie />}
-                          colorScheme="blue"
-                          onClick={() => handleDemoLogin('admin@workzen.com')}
-                          _hover={{ transform: "translateY(-1px)", boxShadow: "md" }}
-                          isDisabled={isLoading}
-                        >
-                          Manager Demo
-                        </Button>
-                        <Button
-                          size="md"
-                          variant="outline"
-                          leftIcon={<FaUsers />}
-                          colorScheme="green"
-                          onClick={() => handleDemoLogin('alice@workzen.com')}
-                          _hover={{ transform: "translateY(-1px)", boxShadow: "md" }}
-                          isDisabled={isLoading}
-                        >
-                          Employee Demo
-                        </Button>
-                      </SimpleGrid>
-                      
-                      <VStack spacing={2}>
-                        <Text fontSize="xs" color="gray.400" textAlign="center">
-                          All demo accounts use password: <Badge colorScheme="gray">password123</Badge>
-                        </Text>
-                        <VStack spacing={1} fontSize="xs" color="gray.400">
-                          <Text><strong>Manager:</strong> admin@workzen.com</Text>
-                          <Text><strong>Employee:</strong> alice@workzen.com, bob@workzen.com, carol@workzen.com</Text>
+                        {/* Quick Demo */}
+                        <VStack spacing={4} w="full" pt={4}>
+                          <Text fontSize="sm" color="gray.500" textAlign="center" fontWeight="medium">
+                            Quick Demo Access
+                          </Text>
+                          
+                          <SimpleGrid columns={2} spacing={3} w="full">
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<FaUserTie />}
+                              colorScheme="blue"
+                              onClick={() => handleDemoLogin('manager')}
+                              _hover={{ transform: "translateY(-1px)", boxShadow: "md" }}
+                              isDisabled={isConnecting || isLoggingIn}
+                            >
+                              Manager Demo
+                            </Button>
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<FaUsers />}
+                              colorScheme="green"
+                              onClick={() => handleDemoLogin('employee')}
+                              _hover={{ transform: "translateY(-1px)", boxShadow: "md" }}
+                              isDisabled={isConnecting || isLoggingIn}
+                            >
+                              Employee Demo
+                            </Button>
+                          </SimpleGrid>
+                          
+                          <Text fontSize="xs" color="gray.400" textAlign="center">
+                            Demo accounts will connect with your current wallet
+                          </Text>
                         </VStack>
                       </VStack>
-                    </VStack>
+                    )}
                   </VStack>
                 </CardBody>
               </Card>

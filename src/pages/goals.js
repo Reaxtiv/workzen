@@ -338,7 +338,7 @@ export default function GoalsPage() {
                   <Text fontSize="xs" color="gray.500">Reward</Text>
                 </HStack>
                 <Text fontSize="sm" fontWeight="medium" color={textColor}>
-                  {goal.rewards} tokens
+                  {goal.rewards} zens
                 </Text>
               </VStack>
             </SimpleGrid>
