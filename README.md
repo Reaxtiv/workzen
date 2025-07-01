@@ -1,12 +1,12 @@
 # WorkZen - AI-Powered Productivity Monitor with Blockchain
 
+<div align="center">
+  <img src="public/images/workzen.jpg" alt="WorkZen Logo" width="160"/>
+</div>
+
 **Next-generation employee productivity tracking with AI analytics, blockchain verification, and mindful workplace practices.**
 
 ![WorkZen Dashboard](https://img.shields.io/badge/Status-MVP-green) ![Blockchain](https://img.shields.io/badge/Blockchain-Sepolia-blue) ![AI](https://img.shields.io/badge/AI-Enabled-purple)
-
-<div align="center">
-  <img src="public/images/dashboard.png" alt="WorkZen Dashboard" width="800"/>
-</div>
 
 ## 🚀 **Features**
 
@@ -19,7 +19,7 @@
 ### 🔗 **Blockchain Integration**
 - Smart contracts on Sepolia Testnet
 - Immutable activity records with Ethereum verification
-- Transparent reward system with blockchain tokens
+- Transparent reward system with Zen points (not tokens)
 - MetaMask integration for Web3 connectivity
 - Real-time transaction verification on Etherscan
 
@@ -30,7 +30,7 @@
 - Focus time optimization with break recommendations
 
 ### 🎮 **Gamification & Rewards**
-- Zen points system with blockchain-backed rewards
+- Zen points system
 - Achievement unlocking based on productivity milestones
 - Team leaderboards with competitive elements
 - Benefit marketplace for point redemption
@@ -179,12 +179,17 @@ NEXT_PUBLIC_ETHERSCAN_API_KEY=your_etherscan_api_key
 
 ## 📸 **Screenshots**
 
-<div align="center">
-  <img src="public/images/dashboard.png" alt="Dashboard" width="800"/>
-  <img src="public/images/analytics.png" alt="Analytics" width="800"/>
-  <img src="public/images/admin.png" alt="Admin Panel" width="800"/>
-  <img src="public/images/metamask.png" alt="MetaMask Integration" width="400"/>
-</div>
+### WorkZen Dashboard
+![WorkZen Dashboard](public/images/1.png)
+
+### Analytics Panel
+![Analytics Panel](public/images/2.png)
+
+### Admin Panel
+![Admin Panel](public/images/3.png)
+
+### MetaMask Integration
+![MetaMask Integration](public/images/4.png)
 
 ## 🎯 **Project Structure**
 
@@ -248,7 +253,6 @@ workzen/
 ### Data Protection:
 - GDPR compliant data handling
 - End-to-end encryption for sensitive data
-- Local data processing with optional cloud sync
 - User consent management system
 
 ### Blockchain Security:
@@ -333,8 +337,6 @@ MIT License - see LICENSE.md
 - **Twitter**: [@WorkZen_app](https://x.com/WorkZen_app)
 - **Email**: [workzen.work@gmail.com](mailto:workzen.work@gmail.com)
 
-
-
 ## 🎬 **Demo & Screenshots**
 
 ### 🎥 Video Demo
@@ -343,13 +345,7 @@ MIT License - see LICENSE.md
 ### 📱 Live Application
 Experience WorkZen live at: [workzen-theta.vercel.app](https://workzen-theta.vercel.app/login)
 
-### 📸 More Screenshots
-
-<div align="center">
-  <img src="public/images/employee-view.png" alt="Employee View" width="800"/>
-  <img src="public/images/rewards.png" alt="Rewards" width="800"/>
-</div>
-
 ---
 
-**🧘 Built with mindfulness. Powered by
+**🧘 Built with mindfulness. Powered by AI. Secured by blockchain.**
+
