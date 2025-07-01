@@ -115,11 +115,61 @@ class SystemMonitor {
     }
   }
 
+  // 🕸️ Clasificar actividad web y aplicaciones
+  classifyWebActivity(urlOrApp) {
+    // Listas de patrones para cada categoría
+    const social = [
+      'facebook', 'twitter', 'instagram', 'tiktok', 'linkedin', 'pinterest', 'snapchat', 'reddit', 'discord'
+    ];
+    const messaging = [
+      'whatsapp', 'telegram', 'messenger', 'slack', 'teams', 'gmail', 'outlook', 'zoom', 'skype', 'meet', 'webex'
+    ];
+    const shopping = [
+      'amazon', 'ebay', 'aliexpress', 'mercadolibre', 'shopify', 'walmart', 'carrefour', 'zalando', 'shein'
+    ];
+    const entertainment = [
+      'youtube', 'netflix', 'spotify', 'twitch', 'hbo', 'primevideo', 'disneyplus', 'hulu', 'appletv'
+    ];
+    const productive = [
+      'github', 'gitlab', 'notion', 'trello', 'asana', 'workzen', 'office', 'docs', 'sheets', 'drive', 'figma', 'vscode', 'jira', 'confluence', 'stackoverflow'
+    ];
+    const distractions = [
+      'game', 'gaming', 'roblox', 'fortnite', 'steam', 'epicgames', 'minijuegos', 'chess', 'poker', 'bet', 'casino'
+    ];
+
+    const str = urlOrApp.toLowerCase();
+    if (productive.some(p => str.includes(p))) return 'productive';
+    if (social.some(p => str.includes(p))) return 'social';
+    if (messaging.some(p => str.includes(p))) return 'messaging';
+    if (shopping.some(p => str.includes(p))) return 'shopping';
+    if (entertainment.some(p => str.includes(p))) return 'entertainment';
+    if (distractions.some(p => str.includes(p))) return 'distraction';
+    return 'other';
+  }
+
+  // 🕸️ Monitorear cambios de pestaña/ventana activa y registrar actividad web
+  monitorWebActivity() {
+    const logWeb = () => {
+      let url = '';
+      try {
+        url = window.location.href || document.title || '';
+      } catch {
+        url = '';
+      }
+      const category = this.classifyWebActivity(url);
+      this.logActivity('web_activity', { url, category });
+    };
+    window.addEventListener('focus', logWeb);
+    window.addEventListener('blur', logWeb);
+    setInterval(logWeb, 15000); // Cada 15s
+  }
+
   // 🔄 Iniciar monitoreo
   start() {
     this.startTime = Date.now();
     this.isActive = true;
     this.detectUserActivity();
+    this.monitorWebActivity(); // <-- Añadido
     this.logActivity('monitoring_started');
     
     console.log('🖥️ SystemMonitor: Monitoreo iniciado');
